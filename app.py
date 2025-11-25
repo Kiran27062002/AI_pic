@@ -9,7 +9,7 @@ import streamlit as st
 with st.spinner("Generating image from prompt..."):
     try:
         from openai import OpenAI
-        client = OpenAI(api_key=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)
+        client = OpenAI(api_key)
 
         result = client.images.generate(
             model="gpt-image-1",
