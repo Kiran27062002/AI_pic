@@ -6,16 +6,27 @@ from PIL import Image, ImageOps
 import streamlit as st
 
 # Optional: Use OpenAI image generation if API key provided
-try:
-    import openai
-    OPENAI_AVAILABLE = True
-except Exception:
-    OPENAI_AVAILABLE = False
+with st.spinner("Generating image from prompt..."):
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=openai_key)
 
-st.set_page_config(page_title="Shirt Print Preview", layout="centered")
+        result = client.images.generate(
+            model="gpt-image-1",
+            prompt=prompt,
+            size="1024x1024"
+        )
 
-st.title("Shirt Print Preview — Simple Overlay")
-st.write("Upload a plain shirt photo, provide a prompt (or upload graphic), and overlay the graphic on the shirt as PNG.")
+        b64 = result.data[0].b64_json
+        image_bytes = base64.b64decode(b64)
+        gen_image = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
+
+        st.success("Image generated.")
+        st.image(gen_image, caption="Generated graphic (preview)", use_column_width=False)
+
+    except Exception as e:
+        st.error(f"Image generation failed: {e}")
+
 
 # Sidebar for API key (optional)
 st.sidebar.header("Optional: Image generation (OpenAI)")
